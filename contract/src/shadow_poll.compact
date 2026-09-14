@@ -1,0 +1,48 @@
+// ShadowPoll — a privacy-preserving Yes/No poll contract.
+//
+// Anyone can read the poll question and the running tallies from public
+// ledger state. Each voter authenticates with a private witness (a secret
+// key only they know) and the circuit derives a one-way nullifier from it.
+// Only that nullifier — never the secret key itself — is disclosed onto the
+// public ledger, where it is used to block double voting. The link between
+// a nullifier and the person who cast it is never revealed.
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+export ledger question: Opaque<"string">;
+
+export ledger yesVotes: Counter;
+
+export ledger noVotes: Counter;
+
+export ledger nullifiers: Set<Bytes<32>>;
+
+constructor(pollQuestion: Opaque<"string">) {
+  question = disclose(pollQuestion);
+}
+
+witness voterSecretKey(): Bytes<32>;
+
+export circuit castVote(voteYes: Boolean): [] {
+  const nullifier = disclose(voteNullifier(voterSecretKey()));
+  assert(
+    !nullifiers.member(nullifier),
+    "This voter has already cast a ballot in this poll"
+  );
+  nullifiers.insert(nullifier);
+  const disclosedVote = disclose(voteYes);
+  if (disclosedVote) {
+    yesVotes.increment(1);
+  } else {
+    noVotes.increment(1);
+  }
+}
+
+export circuit voteNullifier(secretKey: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([
+    pad(32, "shadowpoll:nullifier:"),
+    secretKey
+  ]);
+}
