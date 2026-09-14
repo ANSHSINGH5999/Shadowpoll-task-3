@@ -6,5 +6,5 @@
   "engines": {
     "node": ">=22"
   },
-  "workspaces": ["contract", "cli"]
+  "workspaces": ["contract", "cli", "web"]
 }

@@ -1,0 +1,82 @@
+"use client";
+
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { OrbitParticles } from "./Particles";
+
+type PrivacyCoreProps = {
+  paused?: boolean;
+  dim?: boolean;
+  particleCount: number;
+};
+
+/**
+ * The central "privacy voting core" — a dark glass core inside a wireframe
+ * shell, ringed by orbiting particles. Purely a visualization: the real
+ * one-way transformation (secret key -> nullifier) happens in the deployed
+ * Compact circuit, not here.
+ */
+export function PrivacyCore({ paused = false, dim = false, particleCount }: PrivacyCoreProps) {
+  const shellRef = useRef<THREE.Mesh>(null);
+  const ringGroupRef = useRef<THREE.Group>(null);
+  const coreRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state, delta) => {
+    if (paused) return;
+    if (shellRef.current) shellRef.current.rotation.y += delta * 0.12;
+    if (shellRef.current) shellRef.current.rotation.x += delta * 0.03;
+    if (ringGroupRef.current) ringGroupRef.current.rotation.z += delta * 0.08;
+    if (coreRef.current) {
+      const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.2) * 0.03;
+      coreRef.current.scale.setScalar(pulse);
+    }
+  });
+
+  const emissiveIntensity = dim ? 0.25 : 0.9;
+
+  return (
+    <group>
+      {/* inner glass core */}
+      <mesh ref={coreRef}>
+        <icosahedronGeometry args={[0.55, 2]} />
+        <meshPhysicalMaterial
+          color="#12131a"
+          emissive={dim ? "#2a2a44" : "#4a3aa7"}
+          emissiveIntensity={emissiveIntensity}
+          roughness={0.2}
+          metalness={0.6}
+          transmission={0.4}
+          thickness={0.6}
+          clearcoat={1}
+        />
+      </mesh>
+
+      {/* outer wireframe shell */}
+      <mesh ref={shellRef}>
+        <icosahedronGeometry args={[0.95, 1]} />
+        <meshBasicMaterial color="#3987e5" wireframe transparent opacity={dim ? 0.15 : 0.35} />
+      </mesh>
+
+      {/* thin orbital rings */}
+      <group ref={ringGroupRef}>
+        <mesh rotation={[Math.PI / 2.2, 0, 0]}>
+          <torusGeometry args={[1.35, 0.006, 8, 96]} />
+          <meshBasicMaterial color="#9085e9" transparent opacity={dim ? 0.2 : 0.5} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2.6, 0.6, 0]}>
+          <torusGeometry args={[1.6, 0.005, 8, 96]} />
+          <meshBasicMaterial color="#3987e5" transparent opacity={dim ? 0.12 : 0.3} />
+        </mesh>
+      </group>
+
+      <OrbitParticles
+        count={particleCount}
+        radius={1.15}
+        color={dim ? "#4a4a5a" : "#9085e9"}
+        paused={paused}
+        opacity={dim ? 0.4 : 0.85}
+      />
+    </group>
+  );
+}

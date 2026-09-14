@@ -16,7 +16,11 @@ contract/            Compact contract, compiled ZK circuits, and simulator tests
   src/test/           vitest suite running against the local Compact runtime simulator
 cli/                  Deployment CLI for Preview / Preprod testnets
   src/deploy.ts        builds a wallet, funds it from the faucet, deploys the contract
+  src/vote.ts          casts a ballot on an already-deployed contract
   src/launcher/        entry points per network
+web/                  Live read-only dashboard (Next.js), deployed on Vercel
+  lib/shadowpoll.ts     fetches + decodes real contract state from the public indexer
+  app/components/3d/    supplementary Three.js privacy-model visualization
 screenshots/          compile output, test run, and deployment output
 ```
 
@@ -99,6 +103,27 @@ This will:
 4. Submit the ShadowPoll deployment transaction and print the resulting **contract address**.
 
 See `screenshots/deploy-output.png` for a completed run, and [Deployment](#deployment) below for the live address.
+
+### Cast a vote
+
+```bash
+cd cli
+node --loader ts-node/esm src/launcher/vote-preview.ts <contractAddress> yes <fundedWalletSeed>
+```
+
+## Live dashboard
+
+A read-only dashboard reads the deployed contract's state straight from the public
+Midnight Preview indexer (no mock data) and renders the live question, Yes/No tallies,
+and nullifier count, plus a supplementary Three.js visualization of the privacy model
+(a "private witness" flowing through a "privacy core" into a public nullifier and
+ledger — decorative, `aria-hidden`, with a static/reduced-motion fallback; every
+number it reflects is also plain accessible HTML on the same page).
+
+```bash
+cd web
+npm run dev    # http://localhost:3000
+```
 
 ## Deployment
 

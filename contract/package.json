@@ -11,6 +11,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./shadow_poll": {
+      "types": "./dist/managed/shadow_poll/contract/index.d.ts",
+      "import": "./dist/managed/shadow_poll/contract/index.js",
+      "default": "./dist/managed/shadow_poll/contract/index.js"
     }
   },
   "scripts": {
