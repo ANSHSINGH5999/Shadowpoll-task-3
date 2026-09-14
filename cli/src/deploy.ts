@@ -1,4 +1,5 @@
 import { WebSocket } from "ws";
+import { StaticProofServerContainer } from "@midnight-ntwrk/testkit-js";
 import { NodeZkConfigProvider } from "@midnight-ntwrk/midnight-js-node-zk-config-provider";
 import { indexerPublicDataProvider } from "@midnight-ntwrk/midnight-js-indexer-public-data-provider";
 import { httpClientProofProvider } from "@midnight-ntwrk/midnight-js-http-client-proof-provider";
@@ -37,13 +38,24 @@ const randomBytes = (length: number): Uint8Array => {
  * dust (fee capacity) from the received NIGHT, then submits the contract
  * deployment transaction and prints the resulting contract address.
  */
-export const runDeploy = async (config: Config, pollQuestion: string): Promise<void> => {
+export const runDeploy = async (
+  config: Config,
+  pollQuestion: string,
+  staticProofServerPort?: number,
+): Promise<void> => {
   const logger = await createLogger(config.logDir);
   const testEnv = config.getEnvironment(logger);
   let walletProvider: MidnightWalletProvider | undefined;
 
   try {
-    const envConfiguration = await testEnv.start();
+    // A pre-started, long-lived local proof server (see `docker compose -f
+    // proof-server-local.yml up`) is preferred over letting the library spin
+    // up its own ephemeral container: the proof server downloads ~25MB of ZK
+    // parameters on cold start, which can outlast the library's own
+    // container-readiness timeout.
+    const envConfiguration = await testEnv.start(
+      staticProofServerPort ? new StaticProofServerContainer(staticProofServerPort) : undefined,
+    );
     logger.info(`Environment started with configuration: ${JSON.stringify(envConfiguration)}`);
 
     const seed = toHex(randomBytes(32));
