@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../../../",
+  "sources": ["src/shadow_poll.compact", "compiler/standard-library.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAqBA;;;;;;;;;;;;;MAMA,AAAA,QAaC;;;;;cAbuB,SAAgB;;;;;;;;;;;;;;;;;;yCAAhB,SAAgB;;;;;;;qEAAhB,SAAgB;;;OAavC;MAED,AAAA,aAKC;;OAAA;;;;GAxBA;EAFD;;;;;UAAY,cAA8B;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAR1C;;;;;;;;;yEAAyC;IAEzC;;;;;;;;;yEAAgC;IAEhC;;;;;;;;;yEAA+B;IAE/B;;;;;;;;;;yEAAyC;IAGvC;;;;;;;2HAAoB,cAAY;;yEAAxB;;;;;;;GACT;ECvBD,AAAA,kBAAA;oEAAA;;;EDyBA,AAAA,iBAAoC;;0DAApC,cAAoC;;;;;;;;;;;;;;GAAA;EAEpC,AAAA,WAaC,4BAbuB,SAAgB;UAChC,WAAqD;;qDAExD;;;;;;;;;;;4KAAkB,WAAS;;;;0HAAjB;;IAGb;;;;;;;;;;2HAAkB,WAAS;;;;;wEAAjB;UACJ,eAAiC,GAAR,SAAO;QAClC,eAAa;YACf,KAAQ;MAAR;;;;;;;;;;+FAAA,KAAQ;;;;0EAAA;;YAER,KAAO;MAAP;;;;;;;;;;+FAAA,KAAO;;;;0EAAA;;;GAEV;EAED,AAAA,gBAKC,CAL4B,WAAoB;;mCAG7C,WAAS;GAEZ;;;;;;;;;;;;;;;;IAlCD;qCAAA;;;;;;;;;;;0GAAyC;KAAA;IAEzC;qCAAA;;;;;;;;;;;0GAAgC;KAAA;IAEhC;qCAAA;;;;;;;;;;;0GAA+B;KAAA;IAE/B;;;;;uCAAA;;;;;;;;;;;;;;;;4GAAyC;;;;;;uCAAzC;;;;;;;;;;;;4GAAyC;;;;;;;;;;;;;;uCAAzC;;;;;;;;;;;;;;;4GAAyC;;;;;;;;;KAAA;;;;;;;;EAuBzC,AAAA,aAKC;;;;UAL4B,WAAoB;;;;;;;;2CAApB,WAAoB;GAKhD;;;;"
+}
