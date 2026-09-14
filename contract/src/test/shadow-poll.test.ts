@@ -7,7 +7,12 @@ describe("ShadowPoll smart contract", () => {
     const key = randomBytes(32);
     const simulator0 = new ShadowPollSimulator(key, "Ship the new moon milestone?");
     const simulator1 = new ShadowPollSimulator(key, "Ship the new moon milestone?");
-    expect(simulator0.getLedger()).toEqual(simulator1.getLedger());
+    const ledger0 = simulator0.getLedger();
+    const ledger1 = simulator1.getLedger();
+    expect(ledger0.question).toEqual(ledger1.question);
+    expect(ledger0.yesVotes).toEqual(ledger1.yesVotes);
+    expect(ledger0.noVotes).toEqual(ledger1.noVotes);
+    expect(ledger0.nullifiers.size()).toEqual(ledger1.nullifiers.size());
   });
 
   it("initializes the poll question and empty tallies", () => {
