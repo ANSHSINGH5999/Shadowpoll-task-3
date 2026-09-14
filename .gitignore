@@ -1,5 +1,6 @@
 .claude/
 node_modules/
+cli/midnight-level-db/
 dist/
 *.log
 logs/

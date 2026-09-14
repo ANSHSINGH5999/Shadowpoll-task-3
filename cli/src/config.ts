@@ -1,4 +1,5 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   PreprodTestEnvironment,
   PreviewTestEnvironment,
@@ -14,7 +15,7 @@ export interface Config {
   getEnvironment(logger: Logger): TestEnvironment;
 }
 
-export const currentDir = path.resolve(new URL(import.meta.url).pathname, "..");
+export const currentDir = path.dirname(fileURLToPath(import.meta.url));
 
 export class PreviewRemoteConfig implements Config {
   privateStateStoreName = "shadowpoll-private-state";

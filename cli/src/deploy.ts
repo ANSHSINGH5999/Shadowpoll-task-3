@@ -42,6 +42,7 @@ export const runDeploy = async (
   config: Config,
   pollQuestion: string,
   staticProofServerPort?: number,
+  existingSeed?: string,
 ): Promise<void> => {
   const logger = await createLogger(config.logDir);
   const testEnv = config.getEnvironment(logger);
@@ -58,7 +59,7 @@ export const runDeploy = async (
     );
     logger.info(`Environment started with configuration: ${JSON.stringify(envConfiguration)}`);
 
-    const seed = toHex(randomBytes(32));
+    const seed = existingSeed ?? toHex(randomBytes(32));
     walletProvider = await MidnightWalletProvider.build(logger, envConfiguration, seed);
     await walletProvider.start();
 
@@ -67,7 +68,7 @@ export const runDeploy = async (
       walletProvider.wallet,
       envConfiguration,
       unshieldedToken(),
-      true,
+      !existingSeed, // request from faucet only for a brand-new wallet
     );
     const nightBalance = unshieldedState.balances[unshieldedToken().raw] ?? 0n;
     logger.info(`Your NIGHT wallet balance is: ${nightBalance}`);

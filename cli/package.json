@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "deploy:preview": "node --loader ts-node/esm src/launcher/preview.ts",
-    "deploy:preprod": "node --loader ts-node/esm src/launcher/preprod.ts",
+    "proof-server:up": "docker compose -f proof-server-local.yml up -d",
+    "proof-server:down": "docker compose -f proof-server-local.yml down",
+    "deploy:preview": "PROOF_SERVER_PORT=6300 node --loader ts-node/esm src/launcher/preview.ts",
+    "deploy:preprod": "PROOF_SERVER_PORT=6300 node --loader ts-node/esm src/launcher/preprod.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
