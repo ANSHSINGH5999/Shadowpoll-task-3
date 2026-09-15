@@ -40,7 +40,7 @@ export function VoterNode({ paused = false }: VoterNodeProps) {
         <octahedronGeometry args={[0.11, 0]} />
         <meshStandardMaterial
           color="#12131a"
-          emissive="#3987e5"
+          emissive="#5b8def"
           emissiveIntensity={0.6}
           roughness={0.3}
           metalness={0.5}

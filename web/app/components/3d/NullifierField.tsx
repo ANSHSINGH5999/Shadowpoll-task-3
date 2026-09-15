@@ -55,7 +55,7 @@ export function NullifierField({ count, paused = false }: NullifierFieldProps) {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, MAX_VISIBLE]} frustumCulled={false}>
       <tetrahedronGeometry args={[0.045]} />
-      <meshStandardMaterial color="#12131a" emissive="#e34948" emissiveIntensity={0.35} roughness={0.4} />
+      <meshStandardMaterial color="#12131a" emissive="#e0574f" emissiveIntensity={0.35} roughness={0.4} />
     </instancedMesh>
   );
 }

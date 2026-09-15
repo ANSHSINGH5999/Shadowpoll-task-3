@@ -12,11 +12,11 @@ type ShadowPollHeroProps = {
 
 function StaticFallback({ state }: { state: PublicPollState }) {
   return (
-    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#08080a] via-[#111116] to-[#0d0d1a]">
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#050505] via-[#0b0b0c] to-[#0f0d1a]">
       <div className="flex items-center gap-6 opacity-80">
-        <div className="h-10 w-10 rounded-full border border-[#3987e5]/60" />
-        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#4a3aa7] to-[#3987e5] blur-[1px]" />
-        <div className="h-10 w-16 rounded-md border border-[#9085e9]/40" />
+        <div className="h-10 w-10 rounded-full border border-[var(--accent)]/50" />
+        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[var(--accent-dim)] to-[var(--accent)] blur-[1px]" />
+        <div className="h-10 w-16 rounded-md border border-[var(--accent)]/30" />
       </div>
       <span className="sr-only">
         {state.status === "indexer-offline"
@@ -44,7 +44,7 @@ export function ShadowPollHero({ state }: ShadowPollHeroProps) {
     <div
       role="presentation"
       aria-hidden="true"
-      className="relative h-[280px] w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[#08080a] sm:h-[360px]"
+      className="relative h-[380px] w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[#050505] sm:h-[480px]"
     >
       {showCanvas ? (
         <Suspense fallback={<StaticFallback state={state} />}>
@@ -60,7 +60,7 @@ export function ShadowPollHero({ state }: ShadowPollHeroProps) {
         <StaticFallback state={state} />
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between px-4 pb-3 text-[10px] uppercase tracking-wide text-[var(--muted)]">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between px-6 pb-5 text-[10px] tracking-[0.2em] text-[var(--muted-2)] uppercase sm:px-8">
         <span>Private witness</span>
         <span>{state.status === "indexer-offline" ? "Disconnected" : "Privacy core"}</span>
         <span>Public ledger</span>

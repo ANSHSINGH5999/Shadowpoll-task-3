@@ -57,46 +57,48 @@ export function ShadowPollApp({
   const visualState: PublicPollState = { status, question, yesVotes, noVotes, totalVotes, nullifierCount };
 
   return (
-    <>
+    <div className="flex flex-col gap-8">
       <ShadowPollHero state={visualState} />
 
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
+      <section className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-7 sm:p-10">
         {fetchError ? (
-          <div className="text-sm text-[var(--series-no)]">
+          <div className="text-sm text-[var(--status-bad)]">
             Couldn&apos;t load live contract state right now: {fetchError}
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
             <div>
-              <div className="text-xs uppercase tracking-wide text-[var(--muted)]">The question</div>
-              <div className="mt-1 text-xl font-medium">{question}</div>
+              <div className="text-xs tracking-[0.2em] text-[var(--muted-2)] uppercase">The question</div>
+              <div className="mt-2 text-xl font-medium tracking-[-0.01em] sm:text-2xl">{question}</div>
             </div>
 
             <VoteBars yesVotes={yesVotes} noVotes={noVotes} />
 
-            <div className="grid grid-cols-3 gap-4 border-t border-[var(--border)] pt-6 text-sm">
-              <div>
-                <div className="text-[var(--muted)]">Total votes</div>
-                <div className="text-lg font-semibold tabular-nums">{totalVotes}</div>
+            <div className="grid grid-cols-3 gap-6 border-t border-[var(--border)] pt-8">
+              <div className="flex flex-col gap-1">
+                <div className="text-xs text-[var(--muted-2)]">Total votes</div>
+                <div className="text-2xl font-medium tabular-nums">{totalVotes}</div>
               </div>
-              <div>
-                <div className="text-[var(--muted)]">Nullifiers spent</div>
-                <div className="text-lg font-semibold tabular-nums">{nullifierCount}</div>
+              <div className="flex flex-col gap-1">
+                <div className="text-xs text-[var(--muted-2)]">Nullifiers spent</div>
+                <div className="text-2xl font-medium tabular-nums">{nullifierCount}</div>
               </div>
-              <div>
-                <div className="text-[var(--muted)]">Network</div>
-                <div className="text-lg font-semibold capitalize">{networkId}</div>
+              <div className="flex flex-col gap-1">
+                <div className="text-xs text-[var(--muted-2)]">Network</div>
+                <div className="text-2xl font-medium capitalize">{networkId}</div>
               </div>
             </div>
 
             {fetchedAtLabel ? (
-              <div className="text-xs text-[var(--muted)]">Live from the public indexer · refreshed {fetchedAtLabel}</div>
+              <div className="text-xs text-[var(--muted-2)]">
+                Live from the public indexer · refreshed {fetchedAtLabel}
+              </div>
             ) : null}
 
             <VotePanel networkId={networkId} contractAddress={contractAddress} />
           </div>
         )}
       </section>
-    </>
+    </div>
   );
 }
