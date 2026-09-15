@@ -1,0 +1,140 @@
+// ProofSupply — privacy-preserving B2B procurement qualification protocol.
+//
+// A supplier holds private commercial attributes (capacity, quality, bid
+// price, lead time, jurisdiction) behind an anchored, issuer-registered
+// commitment. To qualify against a buyer's policy, the supplier proves in
+// zero knowledge that every one of their private attributes clears the
+// policy's thresholds, without ever revealing the attributes themselves.
+// Only a policy-scoped nullifier, the credential commitment, the boolean
+// result, and the timestamp are ever disclosed to the public ledger.
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+export struct Policy {
+  policyVersionId: Bytes<32>;
+  minCapacity: Uint<64>;
+  minQuality: Uint<16>;
+  maxBidPrice: Uint<64>;
+  maxLeadTimeDays: Uint<16>;
+  requiredJurisdiction: Bytes<32>;
+}
+
+export struct QualificationReceipt {
+  policyVersionId: Bytes<32>;
+  credentialCommitment: Bytes<32>;
+  nullifier: Bytes<32>;
+  timestamp: Uint<64>;
+  result: Boolean;
+}
+
+export ledger commitments: Set<Bytes<32>>;
+
+export ledger nullifiers: Set<Bytes<32>>;
+
+export ledger revocations: Set<Bytes<32>>;
+
+export ledger qualificationReceipts: Map<Bytes<32>, QualificationReceipt>;
+
+// The issuer is identified only by the hash of a secret it holds off-chain
+// (the same "shared secret" pattern used for the supplier's own credential
+// commitment below) — enough to gate registration/revocation without a full
+// PKI, and without ever putting the issuer's secret on chain.
+export ledger issuerCommitment: Bytes<32>;
+
+constructor(issuerCommitment_: Bytes<32>) {
+  issuerCommitment = disclose(issuerCommitment_);
+}
+
+witness issuerSecretKey(): Bytes<32>;
+
+// (capacity, quality, bidPrice, leadTime, jurisdiction, credentialSecret, nonce)
+witness supplierWitness(): [Uint<64>, Uint<16>, Uint<64>, Uint<16>, Bytes<32>, Bytes<32>, Bytes<32>];
+
+export circuit registerCommitment(commitment: Bytes<32>): [] {
+  assertIsIssuer();
+  commitments.insert(disclose(commitment));
+}
+
+export circuit revokeCommitment(commitment: Bytes<32>): [] {
+  assertIsIssuer();
+  revocations.insert(disclose(commitment));
+}
+
+export circuit qualify(policy: Policy, timestamp: Uint<64>): [] {
+  const attrs = supplierWitness();
+  const capacity = attrs[0];
+  const quality = attrs[1];
+  const bidPrice = attrs[2];
+  const leadTime = attrs[3];
+  const jurisdiction = attrs[4];
+  const credentialSecret = attrs[5];
+  const nonce = attrs[6];
+
+  const disclosedCommitment = disclose(
+    credentialCommitmentHash(capacity, quality, bidPrice, leadTime, jurisdiction, credentialSecret, nonce)
+  );
+  assert(commitments.member(disclosedCommitment), "Credential commitment is not registered");
+  assert(!revocations.member(disclosedCommitment), "Credential commitment has been revoked");
+
+  assert(capacity >= policy.minCapacity, "Capacity does not meet the policy's minimum");
+  assert(quality >= policy.minQuality, "Quality does not meet the policy's minimum");
+  assert(bidPrice <= policy.maxBidPrice, "Bid price exceeds the policy's maximum");
+  assert(leadTime <= policy.maxLeadTimeDays, "Lead time exceeds the policy's maximum");
+  assert(jurisdiction == policy.requiredJurisdiction, "Jurisdiction does not match the policy's requirement");
+
+  const disclosedPolicyVersionId = disclose(policy.policyVersionId);
+  const disclosedTimestamp = disclose(timestamp);
+  const nullifier = disclose(policyNullifierHash(credentialSecret, disclosedPolicyVersionId));
+
+  assert(!nullifiers.member(nullifier), "This credential has already been submitted against this policy");
+  nullifiers.insert(nullifier);
+
+  qualificationReceipts.insert(
+    nullifier,
+    QualificationReceipt {
+      policyVersionId: disclosedPolicyVersionId,
+      credentialCommitment: disclosedCommitment,
+      nullifier: nullifier,
+      timestamp: disclosedTimestamp,
+      result: disclose(true)
+    }
+  );
+}
+
+circuit assertIsIssuer(): [] {
+  assert(
+    issuerAuthorizationHash(issuerSecretKey()) == issuerCommitment,
+    "Caller is not the authorized issuer"
+  );
+}
+
+export circuit issuerAuthorizationHash(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "proofsupply:issuer:"), secret]);
+}
+
+export circuit credentialCommitmentHash(
+  capacity: Uint<64>,
+  quality: Uint<16>,
+  bidPrice: Uint<64>,
+  leadTime: Uint<16>,
+  jurisdiction: Bytes<32>,
+  secret: Bytes<32>,
+  nonce: Bytes<32>
+): Bytes<32> {
+  return persistentHash<Vector<8, Bytes<32>>>([
+    pad(32, "proofsupply:commitment:"),
+    capacity as Field as Bytes<32>,
+    quality as Field as Bytes<32>,
+    bidPrice as Field as Bytes<32>,
+    leadTime as Field as Bytes<32>,
+    jurisdiction,
+    secret,
+    nonce
+  ]);
+}
+
+export circuit policyNullifierHash(secret: Bytes<32>, policyVersionId: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "proofsupply:nullifier:"), secret, policyVersionId]);
+}

@@ -6,5 +6,5 @@
   "engines": {
     "node": ">=22"
   },
-  "workspaces": ["contract", "cli", "web"]
+  "workspaces": ["contract", "cli", "web", "proofsupply"]
 }
