@@ -111,19 +111,44 @@ cd cli
 node --loader ts-node/esm src/launcher/vote-preview.ts <contractAddress> yes <fundedWalletSeed>
 ```
 
-## Live dashboard
+## Live dashboard + wallet voting
 
-A read-only dashboard reads the deployed contract's state straight from the public
-Midnight Preview indexer (no mock data) and renders the live question, Yes/No tallies,
-and nullifier count, plus a supplementary Three.js visualization of the privacy model
+The dashboard reads the deployed contract's state straight from the public Midnight
+Preview indexer (no mock data) and renders the live question, Yes/No tallies, and
+nullifier count, plus a supplementary Three.js visualization of the privacy model
 (a "private witness" flowing through a "privacy core" into a public nullifier and
 ledger — decorative, `aria-hidden`, with a static/reduced-motion fallback; every
 number it reflects is also plain accessible HTML on the same page).
 
+It also supports **real, client-side voting** via a connected Midnight wallet
+(e.g. [Lace](https://www.lace.io/)):
+
+- `lib/wallet/connect.ts` finds a compatible wallet under `window.midnight` (DApp
+  Connector API `4.x`) and connects it to the Preview network.
+- `lib/wallet/providers.ts` builds the contract providers entirely from the
+  connected wallet: `balanceTx`/`submitTx` delegate to the wallet (it holds the
+  keys), and proving is delegated to the wallet via `getProvingProvider()` — this
+  app never touches a private key or generates a proof itself.
+- `lib/wallet/localStoragePrivateStateProvider.ts` persists the browser's voter
+  secret key in `localStorage` (never sent anywhere), so reloading the page reuses
+  the same voter identity instead of minting a fresh one that could vote again —
+  the nullifier double-vote check is real, not simulated.
+- The 3D scene's `wallet-connecting` / `processing` / `submitted` / `confirmed` /
+  `already-voted` / `failed` states in `app/components/3d/types.ts` are driven by
+  this real flow.
+
 ```bash
 cd web
-npm run dev    # http://localhost:3000
+npm run dev    # http://localhost:3000 — requires a compatible Midnight wallet extension to vote
 ```
+
+**Not yet verified end-to-end**: casting a vote through a real browser wallet
+extension requires an actual Lace install, which wasn't available in the environment
+this was built in. The wiring is typed, linted, and builds cleanly against the real
+`@midnight-ntwrk/dapp-connector-api@4.x` surface, and the read path (indexer,
+`ledger()` decoding, the deployed contract itself) is independently verified — but
+the connect → prove → submit round trip against a live wallet extension should be
+tested by hand before relying on it.
 
 ## Deployment
 

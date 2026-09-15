@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# generated zk artifacts synced from contract/dist (see `npm run sync-zk-assets`)
+/public/keys/
+/public/zkir/
+
 # production
 /build
 

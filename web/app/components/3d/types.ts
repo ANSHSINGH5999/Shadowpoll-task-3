@@ -1,13 +1,20 @@
 /**
- * Visual state for the 3D privacy scene, adapted to what this page actually
- * knows. This dashboard is a read-only view of live chain state (no wallet
- * connection or in-browser voting flow lives here — votes are cast out of
- * band via the CLI), so the state machine only reflects things that are
- * really true: whether we could reach the indexer, and the live tallies.
- * We deliberately do NOT invent "wallet-connected" / "processing" /
- * "proof-generated" states, since nothing on this page produces them.
+ * Visual state for the 3D privacy scene. Every value here corresponds to a
+ * real, observable state of either the live indexer data or the real
+ * wallet-connect + vote-submission flow (lib/wallet) — nothing is faked or
+ * simulated for animation purposes.
  */
-export type ShadowPollVisualState = "loading" | "indexer-offline" | "live";
+export type ShadowPollVisualState =
+  | "loading"
+  | "indexer-offline"
+  | "wallet-disconnected"
+  | "wallet-connecting"
+  | "wallet-connected"
+  | "processing"
+  | "submitted"
+  | "confirmed"
+  | "already-voted"
+  | "failed";
 
 export type PublicPollState = {
   status: ShadowPollVisualState;

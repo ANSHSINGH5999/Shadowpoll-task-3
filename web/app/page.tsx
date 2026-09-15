@@ -1,7 +1,5 @@
 import { getPollSnapshot, CONTRACT_ADDRESS, DEPLOY_TX_HASH, DEPLOY_BLOCK, NETWORK } from "@/lib/shadowpoll";
-import { VoteBars } from "./components/VoteBars";
-import { ShadowPollHero } from "./components/3d/ShadowPollHero";
-import type { PublicPollState } from "./components/3d/types";
+import { ShadowPollApp } from "./components/ShadowPollApp";
 
 export const revalidate = 15;
 
@@ -19,16 +17,12 @@ export default async function Home() {
     error = e instanceof Error ? e.message : "Unknown error fetching contract state";
   }
 
-  const visualState: PublicPollState = snapshot
-    ? {
-        status: "live",
-        question: snapshot.question,
-        yesVotes: snapshot.yesVotes,
-        noVotes: snapshot.noVotes,
-        totalVotes: snapshot.totalVotes,
-        nullifierCount: snapshot.nullifierCount,
-      }
-    : { status: "indexer-offline", question: "", yesVotes: 0, noVotes: 0, totalVotes: 0, nullifierCount: 0 };
+  // Formatted server-side, once, and passed down as a plain string — doing
+  // this inside a client component would format with the server's locale
+  // during SSR and the browser's locale on hydration, mismatching.
+  const fetchedAtLabel = snapshot
+    ? new Date(snapshot.fetchedAt).toLocaleTimeString("en-US", { timeZone: "UTC", timeZoneName: "short" })
+    : null;
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-6 py-16 sm:py-24">
@@ -44,45 +38,17 @@ export default async function Home() {
         </p>
       </header>
 
-      <ShadowPollHero state={visualState} />
-
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
-        {error ? (
-          <div className="text-sm text-[var(--series-no)]">
-            Couldn&apos;t load live contract state right now: {error}
-          </div>
-        ) : snapshot ? (
-          <div className="flex flex-col gap-6">
-            <div>
-              <div className="text-xs uppercase tracking-wide text-[var(--muted)]">
-                The question
-              </div>
-              <div className="mt-1 text-xl font-medium">{snapshot.question}</div>
-            </div>
-
-            <VoteBars yesVotes={snapshot.yesVotes} noVotes={snapshot.noVotes} />
-
-            <div className="grid grid-cols-3 gap-4 border-t border-[var(--border)] pt-6 text-sm">
-              <div>
-                <div className="text-[var(--muted)]">Total votes</div>
-                <div className="text-lg font-semibold tabular-nums">{snapshot.totalVotes}</div>
-              </div>
-              <div>
-                <div className="text-[var(--muted)]">Nullifiers spent</div>
-                <div className="text-lg font-semibold tabular-nums">{snapshot.nullifierCount}</div>
-              </div>
-              <div>
-                <div className="text-[var(--muted)]">Network</div>
-                <div className="text-lg font-semibold capitalize">{NETWORK}</div>
-              </div>
-            </div>
-
-            <div className="text-xs text-[var(--muted)]">
-              Live from the public indexer · refreshed {new Date(snapshot.fetchedAt).toLocaleTimeString()}
-            </div>
-          </div>
-        ) : null}
-      </section>
+      <ShadowPollApp
+        networkId={NETWORK}
+        contractAddress={CONTRACT_ADDRESS}
+        question={snapshot?.question ?? ""}
+        yesVotes={snapshot?.yesVotes ?? 0}
+        noVotes={snapshot?.noVotes ?? 0}
+        totalVotes={snapshot?.totalVotes ?? 0}
+        nullifierCount={snapshot?.nullifierCount ?? 0}
+        fetchError={error}
+        fetchedAtLabel={fetchedAtLabel}
+      />
 
       <section className="flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8">
         <h2 className="text-lg font-semibold">Public state vs. private witness</h2>

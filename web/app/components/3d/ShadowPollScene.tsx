@@ -29,7 +29,14 @@ export function ShadowPollScene({ state, reducedMotion, compact }: ShadowPollSce
     rootRef.current.rotation.x += (-y * 0.08 - rootRef.current.rotation.x) * 0.04;
   });
 
-  const dim = state.status === "indexer-offline";
+  const dim = state.status === "indexer-offline" || state.status === "wallet-disconnected" || state.status === "loading";
+  const active = state.status === "processing" || state.status === "wallet-connecting";
+  const ledgerVariant =
+    state.status === "already-voted" || state.status === "failed"
+      ? "warning"
+      : state.status === "confirmed" || state.status === "submitted"
+        ? "success"
+        : "normal";
   const paused = reducedMotion;
   const particleCount = compact ? 40 : 90;
 
@@ -48,7 +55,7 @@ export function ShadowPollScene({ state, reducedMotion, compact }: ShadowPollSce
       </group>
 
       <group position={[0, 0, 0]}>
-        <PrivacyCore paused={paused} dim={dim} particleCount={particleCount} />
+        <PrivacyCore paused={paused} dim={dim} active={active} particleCount={particleCount} />
       </group>
 
       <group position={[1.5, -0.1, 0]} scale={0.85}>
@@ -56,7 +63,7 @@ export function ShadowPollScene({ state, reducedMotion, compact }: ShadowPollSce
       </group>
 
       <group position={[2.3, 0, 0]} scale={0.9}>
-        <PublicLedgerPanel totalVotes={state.totalVotes} paused={paused} />
+        <PublicLedgerPanel totalVotes={state.totalVotes} paused={paused} variant={ledgerVariant} />
       </group>
 
       {/* Yes path: core -> upper right toward the ledger */}

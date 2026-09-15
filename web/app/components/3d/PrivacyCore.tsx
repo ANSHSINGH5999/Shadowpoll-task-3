@@ -8,6 +8,7 @@ import { OrbitParticles } from "./Particles";
 type PrivacyCoreProps = {
   paused?: boolean;
   dim?: boolean;
+  active?: boolean;
   particleCount: number;
 };
 
@@ -15,25 +16,28 @@ type PrivacyCoreProps = {
  * The central "privacy voting core" — a dark glass core inside a wireframe
  * shell, ringed by orbiting particles. Purely a visualization: the real
  * one-way transformation (secret key -> nullifier) happens in the deployed
- * Compact circuit, not here.
+ * Compact circuit, not here. `active` reflects a real in-flight vote
+ * (wallet is proving/submitting), not a fake progress animation.
  */
-export function PrivacyCore({ paused = false, dim = false, particleCount }: PrivacyCoreProps) {
+export function PrivacyCore({ paused = false, dim = false, active = false, particleCount }: PrivacyCoreProps) {
   const shellRef = useRef<THREE.Mesh>(null);
   const ringGroupRef = useRef<THREE.Group>(null);
   const coreRef = useRef<THREE.Mesh>(null);
 
+  const speed = active ? 2.2 : 1;
+
   useFrame((state, delta) => {
     if (paused) return;
-    if (shellRef.current) shellRef.current.rotation.y += delta * 0.12;
-    if (shellRef.current) shellRef.current.rotation.x += delta * 0.03;
-    if (ringGroupRef.current) ringGroupRef.current.rotation.z += delta * 0.08;
+    if (shellRef.current) shellRef.current.rotation.y += delta * 0.12 * speed;
+    if (shellRef.current) shellRef.current.rotation.x += delta * 0.03 * speed;
+    if (ringGroupRef.current) ringGroupRef.current.rotation.z += delta * 0.08 * speed;
     if (coreRef.current) {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.2) * 0.03;
+      const pulse = 1 + Math.sin(state.clock.elapsedTime * (active ? 3 : 1.2)) * (active ? 0.06 : 0.03);
       coreRef.current.scale.setScalar(pulse);
     }
   });
 
-  const emissiveIntensity = dim ? 0.25 : 0.9;
+  const emissiveIntensity = dim ? 0.25 : active ? 1.4 : 0.9;
 
   return (
     <group>

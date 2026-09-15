@@ -7,6 +7,14 @@ import * as THREE from "three";
 type PublicLedgerPanelProps = {
   totalVotes: number;
   paused?: boolean;
+  /** Reflects the real outcome of the last submitted vote, if any. */
+  variant?: "normal" | "warning" | "success";
+};
+
+const RING_COLOR: Record<NonNullable<PublicLedgerPanelProps["variant"]>, string> = {
+  normal: "#1baf7a",
+  warning: "#e34948",
+  success: "#1baf7a",
 };
 
 /**
@@ -15,7 +23,7 @@ type PublicLedgerPanelProps = {
  * a visual stand-in for "this is public." The real numbers are rendered as
  * accessible HTML elsewhere on the page.
  */
-export function PublicLedgerPanel({ totalVotes, paused = false }: PublicLedgerPanelProps) {
+export function PublicLedgerPanel({ totalVotes, paused = false, variant = "normal" }: PublicLedgerPanelProps) {
   const groupRef = useRef<THREE.Group>(null);
 
   const panels = useMemo(
@@ -52,10 +60,14 @@ export function PublicLedgerPanel({ totalVotes, paused = false }: PublicLedgerPa
           />
         </mesh>
       ))}
-      {/* verification ring, brightens slightly with more activity */}
+      {/* verification ring: green normally/on success, red on a real failure/already-voted result */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.12, -0.16]}>
         <torusGeometry args={[0.62, 0.008, 8, 64]} />
-        <meshBasicMaterial color="#1baf7a" transparent opacity={0.25 + activity * 0.35} />
+        <meshBasicMaterial
+          color={RING_COLOR[variant]}
+          transparent
+          opacity={variant === "normal" ? 0.25 + activity * 0.35 : 0.7}
+        />
       </mesh>
     </group>
   );
