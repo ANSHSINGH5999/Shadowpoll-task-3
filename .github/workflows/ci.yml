@@ -30,7 +30,7 @@ jobs:
       - name: compact compile
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          compact update
+          compact update 0.31.1
           cd contract
           npm run compact
 
