@@ -36,7 +36,7 @@ export default async function Home() {
             <span>New Moon · Preview testnet</span>
           </span>
           <a
-            href="https://github.com/ANSHSINGH5999/shadowpoll"
+            href="https://github.com/ANSHSINGH5999/Shadowpoll-task-3"
             className="border-b border-transparent text-[var(--foreground)] transition-colors hover:border-[var(--foreground)]"
           >
             GitHub

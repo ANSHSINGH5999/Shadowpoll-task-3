@@ -1,6 +1,6 @@
 # ShadowPoll
 
-![CI](https://github.com/ANSHSINGH5999/shadowpoll/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/ANSHSINGH5999/Shadowpoll-task-3/actions/workflows/ci.yml/badge.svg)
 
 > A privacy-preserving Yes/No poll on Midnight — anyone can verify the tally, nobody can see who voted.
 
@@ -98,8 +98,8 @@ Three.js / React Three Fiber (supplementary privacy-model visualization), Vercel
 ## Setup & Run Locally
 
 ```bash
-git clone https://github.com/ANSHSINGH5999/shadowpoll.git
-cd shadowpoll
+git clone https://github.com/ANSHSINGH5999/Shadowpoll-task-3.git
+cd Shadowpoll-task-3
 npm install
 ```
 
