@@ -12,8 +12,8 @@ type ShadowPollHeroProps = {
 
 function StaticFallback({ state }: { state: PublicPollState }) {
   return (
-    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#050505] via-[#0b0b0c] to-[#0f0d1a]">
-      <div className="flex items-center gap-6 opacity-80">
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#f3f1fb] via-[#faf9f7] to-[#ffffff]">
+      <div className="flex items-center gap-6 opacity-90">
         <div className="h-10 w-10 rounded-full border border-[var(--accent)]/50" />
         <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[var(--accent-dim)] to-[var(--accent)] blur-[1px]" />
         <div className="h-10 w-16 rounded-md border border-[var(--accent)]/30" />
@@ -44,7 +44,7 @@ export function ShadowPollHero({ state }: ShadowPollHeroProps) {
     <div
       role="presentation"
       aria-hidden="true"
-      className="relative h-[380px] w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[#050505] sm:h-[480px]"
+      className="relative h-[380px] w-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-gradient-to-br from-[#f3f1fb] via-[#faf9f7] to-[#ffffff] sm:h-[480px]"
     >
       {showCanvas ? (
         <Suspense fallback={<StaticFallback state={state} />}>

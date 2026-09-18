@@ -33,14 +33,14 @@ export function VoterNode({ paused = false }: VoterNodeProps) {
       {/* silhouette */}
       <mesh position={[0, 0, 0]}>
         <capsuleGeometry args={[0.28, 0.55, 4, 12]} />
-        <meshStandardMaterial color="#0d0d10" roughness={0.85} metalness={0.1} />
+        <meshStandardMaterial color="#18171f" roughness={0.85} metalness={0.1} />
       </mesh>
       {/* sealed private-witness capsule */}
       <mesh ref={lockRef} position={[0, 0.05, 0.22]}>
         <octahedronGeometry args={[0.11, 0]} />
         <meshStandardMaterial
-          color="#12131a"
-          emissive="#5b8def"
+          color="#18171f"
+          emissive="#3763c9"
           emissiveIntensity={0.6}
           roughness={0.3}
           metalness={0.5}

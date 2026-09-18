@@ -16,8 +16,8 @@ type ShadowPollSceneProps = {
   compact: boolean;
 };
 
-const YES_COLOR = "#5b8def";
-const NO_COLOR = "#e0754a";
+const YES_COLOR = "#3763c9";
+const NO_COLOR = "#b8552e";
 
 export function ShadowPollScene({ state, reducedMotion, compact }: ShadowPollSceneProps) {
   const rootRef = useRef<THREE.Group>(null);
@@ -46,9 +46,9 @@ export function ShadowPollScene({ state, reducedMotion, compact }: ShadowPollSce
 
   return (
     <group ref={rootRef}>
-      <ambientLight intensity={0.35} color="#4a3aa7" />
-      <pointLight position={[2, 2, 3]} intensity={dim ? 20 : 45} color="#5b8def" distance={8} />
-      <pointLight position={[-2, -1, -2]} intensity={dim ? 8 : 18} color="#7c6ef0" distance={8} />
+      <ambientLight intensity={0.65} color="#ffffff" />
+      <pointLight position={[2, 2, 3]} intensity={dim ? 20 : 45} color="#3763c9" distance={8} />
+      <pointLight position={[-2, -1, -2]} intensity={dim ? 8 : 18} color="#5a4bd6" distance={8} />
 
       <group position={[-2.1, 0, 0]}>
         <VoterNode paused={paused} />

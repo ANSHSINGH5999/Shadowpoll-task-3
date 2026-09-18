@@ -12,9 +12,9 @@ type PublicLedgerPanelProps = {
 };
 
 const RING_COLOR: Record<NonNullable<PublicLedgerPanelProps["variant"]>, string> = {
-  normal: "#3fae82",
-  warning: "#e0574f",
-  success: "#3fae82",
+  normal: "#1f8f63",
+  warning: "#c23b33",
+  success: "#1f8f63",
 };
 
 /**
@@ -49,13 +49,13 @@ export function PublicLedgerPanel({ totalVotes, paused = false, variant = "norma
         <mesh key={i} position={[0, p.y, p.depth]}>
           <boxGeometry args={[0.9, 0.16, 0.02]} />
           <meshPhysicalMaterial
-            color="#111114"
+            color="#18171f"
             transparent
             opacity={p.opacity}
             roughness={0.3}
             metalness={0.4}
             transmission={0.3}
-            emissive="#5b8def"
+            emissive="#3763c9"
             emissiveIntensity={0.15 + activity * 0.25}
           />
         </mesh>

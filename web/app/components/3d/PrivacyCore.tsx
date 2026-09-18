@@ -45,8 +45,8 @@ export function PrivacyCore({ paused = false, dim = false, active = false, parti
       <mesh ref={coreRef}>
         <icosahedronGeometry args={[0.55, 2]} />
         <meshPhysicalMaterial
-          color="#12131a"
-          emissive={dim ? "#2a2a44" : "#4a3aa7"}
+          color="#18171f"
+          emissive={dim ? "#3a3550" : "#5a4bd6"}
           emissiveIntensity={emissiveIntensity}
           roughness={0.2}
           metalness={0.6}
@@ -59,27 +59,27 @@ export function PrivacyCore({ paused = false, dim = false, active = false, parti
       {/* outer wireframe shell */}
       <mesh ref={shellRef}>
         <icosahedronGeometry args={[0.95, 1]} />
-        <meshBasicMaterial color="#5b8def" wireframe transparent opacity={dim ? 0.15 : 0.35} />
+        <meshBasicMaterial color="#3763c9" wireframe transparent opacity={dim ? 0.18 : 0.45} />
       </mesh>
 
       {/* thin orbital rings */}
       <group ref={ringGroupRef}>
         <mesh rotation={[Math.PI / 2.2, 0, 0]}>
           <torusGeometry args={[1.35, 0.006, 8, 96]} />
-          <meshBasicMaterial color="#7c6ef0" transparent opacity={dim ? 0.2 : 0.5} />
+          <meshBasicMaterial color="#5a4bd6" transparent opacity={dim ? 0.25 : 0.6} />
         </mesh>
         <mesh rotation={[Math.PI / 2.6, 0.6, 0]}>
           <torusGeometry args={[1.6, 0.005, 8, 96]} />
-          <meshBasicMaterial color="#5b8def" transparent opacity={dim ? 0.12 : 0.3} />
+          <meshBasicMaterial color="#3763c9" transparent opacity={dim ? 0.16 : 0.4} />
         </mesh>
       </group>
 
       <OrbitParticles
         count={particleCount}
         radius={1.15}
-        color={dim ? "#4a4a5a" : "#7c6ef0"}
+        color={dim ? "#9a97a6" : "#5a4bd6"}
         paused={paused}
-        opacity={dim ? 0.4 : 0.85}
+        opacity={dim ? 0.45 : 0.85}
       />
     </group>
   );
