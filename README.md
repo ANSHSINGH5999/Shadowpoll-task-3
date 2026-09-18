@@ -1,15 +1,21 @@
 # ShadowPoll
 
+![CI](https://github.com/ANSHSINGH5999/shadowpoll/actions/workflows/ci.yml/badge.svg)
+
 > A privacy-preserving Yes/No poll on Midnight — anyone can verify the tally, nobody can see who voted.
+
+## Live Demo
+
+[https://shadowpoll-nu.vercel.app](https://shadowpoll-nu.vercel.app)
 
 ## Contract Address
 
 | Network | Address |
 |---------|---------|
 | Preview | `af9cf4341fe405b0d4967f969b4fc9271fee80f317e54ac84761971406f95cd4` |
-| Preprod | Not yet deployed |
+| Preprod | [PASTE PREPROD CONTRACT ADDRESS — pending faucet funding, see below] |
 
-Deployment tx: `52ecc1066affa226e60e8578e20971a7d7842fba4c42921eccfe65e42287a024` (block 868378). Verify independently against the public indexer:
+Deployment tx (Preview): `52ecc1066affa226e60e8578e20971a7d7842fba4c42921eccfe65e42287a024` (block 868378). Verify independently against the public indexer:
 
 ```bash
 curl -s -X POST https://indexer.preview.midnight.network/api/v4/graphql \
@@ -62,6 +68,20 @@ export circuit castVote(voteYes: Boolean): [] {
    *every* circuit argument as witness-like by default; even a plain boolean parameter needs
    `disclose()` before it can affect a branch that writes to the ledger.)
 
+## Privacy Claim
+
+**What an on-chain observer sees:** the poll question, the live Yes/No tallies, the full set of spent
+nullifiers (one-way hashes), and — for each vote transaction — a zero-knowledge proof that verifies
+against the deployed circuit. Querying the public indexer (see the `curl` command above) returns exactly
+this: `question`, `yesVotes`, `noVotes`, and `nullifiers`, nothing else.
+
+**What an on-chain observer cannot see:** which nullifier belongs to which person, the voter's secret
+key that produced any given nullifier, or any way to link two different polls' nullifiers back to the
+same voter (each nullifier is domain-separated per poll). There is no field, event, or log anywhere in
+the contract's ledger state that carries voter identity — the simulator test
+`"never reveals the voter's secret key on the public ledger"` (`contract/src/test/shadow-poll.test.ts`)
+asserts this directly against the compiled circuit's own output, not just against documentation.
+
 ## Tech Stack
 
 Midnight network, Compact language (`0.23`, compiler `0.31.1`), `@midnight-ntwrk/midnight-js-*` `4.1.1`,
@@ -75,7 +95,7 @@ Three.js / React Three Fiber (supplementary privacy-model visualization), Vercel
 - The [Compact toolchain](https://docs.midnight.network/tutorial/creating/setting-up) — the `compact`
   CLI plus a downloaded compiler version via `compact update`
 
-## Setup
+## Setup & Run Locally
 
 ```bash
 git clone https://github.com/ANSHSINGH5999/shadowpoll.git
@@ -156,6 +176,25 @@ transitions (tally updates, deterministic initial state), and that private input
 This repo also includes a second, more advanced contract, **ProofSupply** (privacy-preserving B2B
 procurement qualification — see `proofsupply/README.md`), with its own 11-test suite covering positive
 and negative paths (low capacity, revoked commitment, nullifier reuse, unauthorized issuer).
+
+## CI/CD
+
+`.github/workflows/ci.yml` runs on every push and pull request to `main`:
+
+1. Checks out the repo and installs Node.js 22
+2. Installs dependencies (`npm ci`)
+3. Installs the Compact toolchain and runs `compact compile` against `contract/src/shadow_poll.compact`,
+   regenerating `contract/src/managed/shadow_poll/` from scratch (so the committed managed output is
+   never trusted blindly — CI proves it's reproducible)
+4. Builds the `@shadowpoll/contract` package
+5. Runs the vitest suite (`contract/src/test/shadow-poll.test.ts`) against the freshly compiled circuit
+
+A green badge at the top of this README means: the contract compiles cleanly on a fresh checkout, and
+all 8 tests (circuit logic, state transitions, privacy) pass against that fresh build.
+
+## Product Proposal
+
+See [PROPOSAL.md](./PROPOSAL.md).
 
 ## Initial Idea
 
