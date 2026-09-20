@@ -13,7 +13,7 @@ video link https://youtu.be/FTVW27cwT24
 | Network | Address |
 |---------|---------|
 | Preview | `af9cf4341fe405b0d4967f969b4fc9271fee80f317e54ac84761971406f95cd4` |
-| Preprod | [PASTE PREPROD CONTRACT ADDRESS — pending faucet funding, see below] |
+| Preprod | Not deployed; Preview is the verified network |
 
 Deployment tx (Preview): `52ecc1066affa226e60e8578e20971a7d7842fba4c42921eccfe65e42287a024` (block 868378). Verify independently against the public indexer:
 
