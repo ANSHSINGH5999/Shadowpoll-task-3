@@ -33,7 +33,7 @@ export default async function Home() {
         <div className="flex items-center gap-5 text-xs text-[var(--muted)]">
           <span className="hidden items-center gap-1.5 sm:flex">
             <span>🌑</span>
-            <span>New Moon · Preview testnet</span>
+            <span>New Moon · Preprod testnet</span>
           </span>
           <a
             href="https://github.com/ANSHSINGH5999/Shadowpoll-task-3"
@@ -94,7 +94,7 @@ export default async function Home() {
           </div>
           <pre className="overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--background-raised)] p-5 text-xs leading-relaxed text-[var(--muted)] sm:text-[13px]">
             <code>{`export circuit castVote(voteYes: Boolean): [] {
-  const nullifier = disclose(voteNullifier(voterSecretKey()));
+  const nullifier = disclose(voteNullifier(voterSecretKey(), kernel.self().bytes));
   assert(!nullifiers.member(nullifier), "already voted");
   nullifiers.insert(nullifier);
   const disclosedVote = disclose(voteYes);

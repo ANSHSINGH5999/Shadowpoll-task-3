@@ -1,5 +1,4 @@
 # ShadowPoll
-video link https://youtu.be/FTVW27cwT24
 ![CI](https://github.com/ANSHSINGH5999/Shadowpoll-task-3/actions/workflows/ci.yml/badge.svg)
 
 > A privacy-preserving Yes/No poll on Midnight — anyone can verify the tally, nobody can see who voted.
@@ -8,14 +7,32 @@ video link https://youtu.be/FTVW27cwT24
 
 [https://shadowpoll-nu.vercel.app](https://shadowpoll-nu.vercel.app)
 
+Demo video: https://youtu.be/FTVW27cwT24
+
 ## Contract Address
 
-| Network | Address |
-|---------|---------|
-| Preview | `af9cf4341fe405b0d4967f969b4fc9271fee80f317e54ac84761971406f95cd4` |
-| Preprod | Not deployed; Preview is the verified network |
+| Network | Contract Address | Deployment TX | Block |
+|---------|------------------|---------------|-------|
+| **Preprod** | `9e59284468387b6422d83ce78cc08220337d307e19007063fcc9dd3a10e7cdbd` | `0b59d6ae48a56b82d78cc6f49648c0d7164d78f680ccd9da77c1247a2d7d3330` | 2748475 |
+| Preview | `af9cf4341fe405b0d4967f969b4fc9271fee80f317e54ac84761971406f95cd4` | `52ecc1066affa226e60e8578e20971a7d7842fba4c42921eccfe65e42287a024` | 868378 |
 
-Deployment tx (Preview): `52ecc1066affa226e60e8578e20971a7d7842fba4c42921eccfe65e42287a024` (block 868378). Verify independently against the public indexer:
+**Preprod** was deployed with `npm run deploy:preprod` from the current source. Its on-chain `castVote`
+verifier key is byte-identical to `contract/src/managed/shadow_poll/keys/castVote.verifier` produced
+by `npm run compact`. Verify independently against the public Preprod indexer:
+
+```bash
+curl -s -X POST https://indexer.preprod.midnight.network/api/v4/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"query { transactions(offset: {hash: \"0b59d6ae48a56b82d78cc6f49648c0d7164d78f680ccd9da77c1247a2d7d3330\"}) { hash block { height } contractActions { __typename address } } }"}'
+```
+
+This returns a `ContractDeploy` action for the Preprod address above, in block 2748475. To read the
+live ledger state, query `contractAction(address: "9e59284468387b6422d83ce78cc08220337d307e19007063fcc9dd3a10e7cdbd") { address state }`
+instead.
+
+**Preview** was compiled from the earlier revision, before nullifiers were bound to the contract
+address. It remains readable through the query below; the live dashboard now reads the Preprod contract.
+Verify against the public Preview indexer:
 
 ```bash
 curl -s -X POST https://indexer.preview.midnight.network/api/v4/graphql \
@@ -51,7 +68,7 @@ export ledger nullifiers: Set<Bytes<32>>;
 witness voterSecretKey(): Bytes<32>;
 
 export circuit castVote(voteYes: Boolean): [] {
-  const nullifier = disclose(voteNullifier(voterSecretKey()));
+  const nullifier = disclose(voteNullifier(voterSecretKey(), kernel.self().bytes));
   assert(!nullifiers.member(nullifier), "This voter has already cast a ballot in this poll");
   nullifiers.insert(nullifier);
   const disclosedVote = disclose(voteYes);
@@ -61,9 +78,10 @@ export circuit castVote(voteYes: Boolean): [] {
 
 `castVote` deliberately discloses exactly two things and nothing else:
 
-1. `voteNullifier(voterSecretKey())` — a `persistentHash` of the secret key with a domain-separation
-   tag. One-way (nobody can recover the secret key from it), but deterministic (the same voter always
-   produces the same nullifier, so a double vote is caught by `nullifiers.member(...)`).
+1. `voteNullifier(voterSecretKey(), kernel.self().bytes)` — a `persistentHash` of a domain-separation
+   tag, the poll's own contract address, and the secret key. One-way (nobody can recover the secret key
+   from it), deterministic within a poll (a double vote is caught by `nullifiers.member(...)`), and
+   different across polls (the same key cannot be linked between two deployments).
 2. The boolean vote choice itself — disclosed so it can move the public counters. (Compact treats
    *every* circuit argument as witness-like by default; even a plain boolean parameter needs
    `disclose()` before it can affect a branch that writes to the ledger.)
@@ -77,7 +95,7 @@ this: `question`, `yesVotes`, `noVotes`, and `nullifiers`, nothing else.
 
 **What an on-chain observer cannot see:** which nullifier belongs to which person, the voter's secret
 key that produced any given nullifier, or any way to link two different polls' nullifiers back to the
-same voter (each nullifier is domain-separated per poll). There is no field, event, or log anywhere in
+same voter (each nullifier is bound to the poll's contract address). There is no field, event, or log anywhere in
 the contract's ledger state that carries voter identity — the simulator test
 `"never reveals the voter's secret key on the public ledger"` (`contract/src/test/shadow-poll.test.ts`)
 asserts this directly against the compiled circuit's own output, not just against documentation.
@@ -151,7 +169,7 @@ cd web
 npm run dev    # http://localhost:3000
 ```
 
-Reads the deployed contract's state straight from the public Midnight Preview indexer (no mock data)
+Reads the deployed contract's state straight from the public Midnight Preprod indexer (no mock data)
 and renders the live question, Yes/No tallies, and nullifier count, plus a supplementary Three.js
 visualization of the privacy model. It also supports real, client-side voting via a connected Midnight
 wallet (e.g. [Lace](https://www.lace.io/)) — see `web/lib/wallet/` for the DApp Connector API
@@ -168,7 +186,7 @@ npm test
 ```
 
 Runs an offline simulator (`@midnight-ntwrk/compact-runtime`) against the compiled contract — no proof
-server, indexer, or wallet needed. 8 tests covering circuit logic (casting yes/no votes), state
+server, indexer, or wallet needed. 9 tests covering circuit logic (casting yes/no votes), state
 transitions (tally updates, deterministic initial state), and that private inputs are never exposed
 (the raw secret key never appears in ledger state, nor anywhere the nullifier does). See
 `screenshots/test-output.png`.
@@ -190,11 +208,30 @@ and negative paths (low capacity, revoked commitment, nullifier reuse, unauthori
 5. Runs the vitest suite (`contract/src/test/shadow-poll.test.ts`) against the freshly compiled circuit
 
 A green badge at the top of this README means: the contract compiles cleanly on a fresh checkout, and
-all 8 tests (circuit logic, state transitions, privacy) pass against that fresh build.
+all 9 tests (circuit logic, state transitions, privacy) pass against that fresh build.
 
 ## Product Proposal
 
-See [PROPOSAL.md](./PROPOSAL.md).
+Full answers in [PROPOSAL.md](./PROPOSAL.md). Summary of the four required questions:
+
+1. **What is the product, and who uses it?** A privacy-preserving Yes/No poll. Users are DAO/community
+   governance teams, organisations running sensitive internal votes (employee surveys, union ballots,
+   board straw polls), and voters who want a ZK-verified guarantee their ballot counted once and can't be
+   linked to them.
+2. **Why Midnight specifically?** The voter's secret key is a private `witness` that never leaves their
+   machine; one-person-one-vote is enforced by a domain-separated `persistentHash` nullifier checked
+   in-circuit against a public `Set`; and the compiler forces an explicit `disclose()` for anything that
+   reaches public state, so the privacy boundary (nullifier + vote boolean only) is auditable in source.
+   A transparent chain would need custom ZK verifiers plus relayers to get the same result.
+3. **Data model.** *Public ledger:* `question`, `yesVotes`, `noVotes`, `nullifiers`. *Private witness:*
+   `voterSecretKey` (never on-chain). *Disclosed:* the nullifier (one-way hash, unlinkable to a person) and
+   the vote boolean (to move a counter). The ZK proof is public but reveals nothing beyond the statement.
+4. **Mainnet feasibility by Level 6.** Realistic, though not Mainnet-ready today. The contract, tests, CI
+   and live testnet deployments exist. The biggest remaining gap is eligibility: today any key can vote,
+   so the nullifier stops key reuse but not Sybil voting. Remaining scope is a Merkle-root eligibility
+   registry, poll lifecycle, hiding per-vote direction until close, verified Lace voting, an external
+   circuit review, a Preprod load test, and then the Mainnet deploy. This is feature and hardening work,
+   with no open research problems.
 
 ## Initial Idea
 

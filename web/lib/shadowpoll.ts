@@ -2,15 +2,15 @@ import "server-only";
 import { ContractState } from "@midnight-ntwrk/compact-runtime";
 import { ledger } from "@shadowpoll/contract/shadow_poll";
 
-export const NETWORK = "preview" as const;
+export const NETWORK = "preprod" as const;
 export const CONTRACT_ADDRESS =
   process.env.SHADOWPOLL_CONTRACT_ADDRESS ??
-  "af9cf4341fe405b0d4967f969b4fc9271fee80f317e54ac84761971406f95cd4";
+  "9e59284468387b6422d83ce78cc08220337d307e19007063fcc9dd3a10e7cdbd";
 export const DEPLOY_TX_HASH =
-  "52ecc1066affa226e60e8578e20971a7d7842fba4c42921eccfe65e42287a024";
-export const DEPLOY_BLOCK = 868378;
+  "0b59d6ae48a56b82d78cc6f49648c0d7164d78f680ccd9da77c1247a2d7d3330";
+export const DEPLOY_BLOCK = 2748475;
 
-const INDEXER_URL = "https://indexer.preview.midnight.network/api/v4/graphql";
+const INDEXER_URL = "https://indexer.preprod.midnight.network/api/v4/graphql";
 
 export type PollSnapshot = {
   question: string;
@@ -31,7 +31,7 @@ const QUERY = `
 
 /**
  * Fetches the current on-chain state of the deployed ShadowPoll contract
- * straight from the public Midnight Preview indexer, and decodes it with the
+ * straight from the public Midnight Preprod indexer, and decodes it with the
  * same `ledger()` function the compiled contract exports. No caching layer
  * of our own beyond Next's fetch cache — this is live chain data.
  */

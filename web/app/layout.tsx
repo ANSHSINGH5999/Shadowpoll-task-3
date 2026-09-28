@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ShadowPoll — a private poll on Midnight",
   description:
-    "A privacy-preserving Yes/No poll running live on the Midnight Preview testnet. Public tallies, private voter identity.",
+    "A privacy-preserving Yes/No poll running live on the Midnight Preprod testnet. Public tallies, private voter identity.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -59,6 +59,16 @@ export function VotePanel({ networkId, contractAddress }: VotePanelProps) {
               {voting ? "Submitting…" : "Vote No"}
             </button>
           </div>
+          {voting ? (
+            <p role="status" aria-live="polite" className="flex items-center gap-2 text-xs text-[var(--muted)]">
+              <span
+                aria-hidden="true"
+                className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[var(--foreground)]"
+              />
+              Generating zero-knowledge proof locally. Your secret key never leaves this browser; only the
+              nullifier and your Yes/No choice are disclosed.
+            </p>
+          ) : null}
           {voteState === "submitted" || voteState === "confirmed" ? (
             <p className="text-xs text-[var(--status-good)]">
               Vote submitted. Tx: <span className="font-mono">{truncateMiddle(lastTxHash ?? "")}</span> — the tally
