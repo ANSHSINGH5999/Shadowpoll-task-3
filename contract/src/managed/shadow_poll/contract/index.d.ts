@@ -13,13 +13,14 @@ export type ProvableCircuits<PS> = {
 }
 
 export type PureCircuits = {
-  voteNullifier(secretKey_0: Uint8Array): Uint8Array;
+  voteNullifier(secretKey_0: Uint8Array, pollId_0: Uint8Array): Uint8Array;
 }
 
 export type Circuits<PS> = {
   castVote(context: __compactRuntime.CircuitContext<PS>, voteYes_0: boolean): __compactRuntime.CircuitResults<PS, []>;
   voteNullifier(context: __compactRuntime.CircuitContext<PS>,
-                secretKey_0: Uint8Array): __compactRuntime.CircuitResults<PS, Uint8Array>;
+                secretKey_0: Uint8Array,
+                pollId_0: Uint8Array): __compactRuntime.CircuitResults<PS, Uint8Array>;
 }
 
 export type Ledger = {

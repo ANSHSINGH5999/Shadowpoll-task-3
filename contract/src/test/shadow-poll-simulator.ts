@@ -4,6 +4,7 @@ import {
   sampleContractAddress,
   createConstructorContext,
   CostModel,
+  encodeContractAddress,
 } from "@midnight-ntwrk/compact-runtime";
 import {
   Contract,
@@ -21,6 +22,7 @@ import { type ShadowPollPrivateState, witnesses } from "../witnesses.js";
 export class ShadowPollSimulator {
   readonly contract: Contract<ShadowPollPrivateState>;
   circuitContext: CircuitContext<ShadowPollPrivateState>;
+  readonly contractAddress = sampleContractAddress();
 
   constructor(secretKey: Uint8Array, question: string) {
     this.contract = new Contract<ShadowPollPrivateState>(witnesses);
@@ -35,7 +37,7 @@ export class ShadowPollSimulator {
       costModel: CostModel.initialCostModel(),
       currentQueryContext: new QueryContext(
         currentContractState.data,
-        sampleContractAddress(),
+        this.contractAddress,
       ),
     };
   }
@@ -61,8 +63,8 @@ export class ShadowPollSimulator {
     return ledger(this.circuitContext.currentQueryContext.state);
   }
 
-  /** The public nullifier a given secret key would produce (pure, no proof). */
+  /** The public nullifier a given secret key would produce in this poll (pure, no proof). */
   public nullifierFor(secretKey: Uint8Array): Uint8Array {
-    return pureCircuits.voteNullifier(secretKey);
+    return pureCircuits.voteNullifier(secretKey, encodeContractAddress(this.contractAddress));
   }
 }

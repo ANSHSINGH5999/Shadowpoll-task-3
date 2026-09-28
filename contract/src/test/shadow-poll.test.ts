@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { ShadowPollSimulator } from "./shadow-poll-simulator.js";
 import { randomBytes } from "./utils.js";
+import { pureCircuits } from "../managed/shadow_poll/contract/index.js";
 
 describe("ShadowPoll smart contract", () => {
   it("generates initial ledger state deterministically for the same question", () => {
@@ -63,6 +64,13 @@ describe("ShadowPoll smart contract", () => {
     for (const nullifier of ledgerState.nullifiers) {
       expect(nullifier).not.toEqual(key);
     }
+  });
+
+  it("gives the same voter unlinkable nullifiers in different polls", () => {
+    const key = randomBytes(32);
+    const nullifierA = pureCircuits.voteNullifier(key, randomBytes(32));
+    const nullifierB = pureCircuits.voteNullifier(key, randomBytes(32));
+    expect(nullifierA).not.toEqual(nullifierB);
   });
 
   it("does not let the same voter double-vote", () => {

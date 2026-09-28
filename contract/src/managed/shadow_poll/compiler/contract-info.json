@@ -32,6 +32,13 @@
             "type-name": "Bytes",
             "length": 32
           }
+        },
+        {
+          "name": "pollId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
         }
       ],
       "result-type": {

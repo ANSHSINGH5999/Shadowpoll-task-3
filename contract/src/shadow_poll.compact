@@ -26,7 +26,7 @@ constructor(pollQuestion: Opaque<"string">) {
 witness voterSecretKey(): Bytes<32>;
 
 export circuit castVote(voteYes: Boolean): [] {
-  const nullifier = disclose(voteNullifier(voterSecretKey()));
+  const nullifier = disclose(voteNullifier(voterSecretKey(), kernel.self().bytes));
   assert(
     !nullifiers.member(nullifier),
     "This voter has already cast a ballot in this poll"
@@ -40,9 +40,12 @@ export circuit castVote(voteYes: Boolean): [] {
   }
 }
 
-export circuit voteNullifier(secretKey: Bytes<32>): Bytes<32> {
-  return persistentHash<Vector<2, Bytes<32>>>([
+// Binding the nullifier to this contract's address means the same secret key
+// yields unlinkable nullifiers across different poll deployments.
+export circuit voteNullifier(secretKey: Bytes<32>, pollId: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([
     pad(32, "shadowpoll:nullifier:"),
+    pollId,
     secretKey
   ]);
 }
